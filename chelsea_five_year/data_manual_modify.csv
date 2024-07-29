@@ -1,0 +1,44 @@
+#,Player,Age,Contract,Market value,x,Name,Position
+1,Robert SÃ¡nchez Goalkeeper,26.0,"Jun 30, 2030",â¬20.00m,3,Robert Sánchez,Goalkeeper
+28,Djordje Petrovic Goalkeeper,24.0,"Jun 30, 2030",â¬20.00m,3,Djordje Petrovic,Goalkeeper
+-,Kepa Arrizabalaga Goalkeeper,29.0,"Jun 30, 2025",â¬12.00m,3,Kepa Arrizabalaga,Goalkeeper
+-,Gabriel Slonina Goalkeeper,20.0,"Jun 30, 2028",â¬4.00m,3,Gabriel Slonina,Goalkeeper
+13,Marcus Bettinelli Goalkeeper,32.0,"Jun 30, 2026",â¬1.00m,3,Marcus Bettinelli,Goalkeeper
+47,Lucas BergstrÃ¶m Goalkeeper,21.0,"Jun 30, 2025",â¬700k,3,Lucas Bergstrom,Goalkeeper
+6,Levi Colwill Centre-Back,21.0,"Jun 30, 2029",â¬50.00m,3,Levi Colwill,Centre-Back
+2,Axel Disasi Centre-Back,26.0,"Jun 30, 2029",â¬40.00m,3,Axel Disasi,Centre-Back
+5,BenoÃ®t Badiashile Centre-Back,23.0,"Jun 30, 2030",â¬30.00m,3,Benoit Badiashile,Centre-Back
+29,Wesley Fofana Centre-Back,23.0,"Jun 30, 2029",â¬25.00m,3,Wesley Fofana,Centre-Back
+4,Tosin Adarabioyo Centre-Back,26.0,"Jun 30, 2028",â¬20.00m,3,Tosin Adarabioyo,Centre-Back
+14,Trevoh Chalobah Centre-Back,25.0,"Jun 30, 2028",â¬13.00m,3,Trevoh Chalobah,Centre-Back
+42,Alfie Gilchrist Centre-Back,20.0,"Jun 30, 2026",â¬5.00m,3,Alfie Gilchrist,Centre-Back
+3,Marc Cucurella Left-Back,26.0,"Jun 30, 2028",â¬30.00m,3,Marc Cucurella,Left-Back
+21,Ben Chilwell Left-Back,27.0,"Jun 30, 2027",â¬28.00m,3,Ben Chilwell,Left-Back
+-,Caleb Wiley Left-Back,19.0,"Jun 30, 2030",â¬5.00m,3,Caleb Wiley,Left-Back
+24,Reece James Right-Back,24.0,"Jun 30, 2028",â¬40.00m,3,Reece James,Right-Back
+27,Malo Gusto Right-Back,21.0,"Jun 30, 2030",â¬35.00m,3,Malo Gusto,Right-Back
+25,MoisÃ©s Caicedo Defensive-Midfield,22.0,"Jun 30, 2031",â¬75.00m,3,Moisés Caicedo,Defensive-Midfield
+45,RomÃ©o Lavia Defensive-Midfield,20.0,"Jun 30, 2030",â¬35.00m,3,Roméo Lavia,Defensive-Midfield
+16,Lesley Ugochukwu Defensive-Midfield,20.0,"Jun 30, 2030",â¬25.00m,3,Lesley Ugochukwu,Defensive-Midfield
+40,Renato Veiga Defensive-Midfield,21.0,"Jun 30, 2031",â¬3.00m,3,Renato Veiga,Defensive-Midfield
+8,Enzo FernÃ¡ndez Central-Midfield,23.0,"Jun 30, 2032",â¬75.00m,3,Enzo Fernández,Central-Midfield
+23,Conor Gallagher Central-Midfield,24.0,"Jun 30, 2025",â¬50.00m,3,Conor Gallagher,Central-Midfield
+22,Kiernan Dewsbury-Hall Central-Midfield,25.0,"Jun 30, 2029",â¬30.00m,3,Kiernan Dewsbury-Hall,Central-Midfield
+17,Carney Chukwuemeka Central-Midfield,20.0,"Jun 30, 2028",â¬15.00m,3,Carney Chukwuemeka,Central-Midfield
+39,Andrey Santos Central-Midfield,20.0,"Jun 30, 2030",â¬15.00m,3,Andrey Santos,Central-Midfield
+31,Cesare Casadei Central-Midfield,21.0,"Jun 30, 2028",â¬10.00m,3,Cesare Casadei,Central-Midfield
+20,Cole Palmer Attacking-Midfield,22.0,"Jun 30, 2030",â¬80.00m,3,Cole Palmer,Attacking-Midfield
+18,Christopher Nkunku Attacking-Midfield,26.0,"Jun 30, 2029",â¬65.00m,3,Christopher Nkunku,Attacking-Midfield
+37,Omari Kellyman Attacking-Midfield,18.0,"Jun 30, 2030",â¬1.00m,3,Omari Kellyman,Attacking-Midfield
+7,Raheem Sterling Left-Winger,29.0,"Jun 30, 2027",â¬35.00m,3,Raheem Sterling,Left-Winger
+10,Mykhaylo Mudryk Left-Winger,23.0,"Jun 30, 2031",â¬35.00m,3,Mykhaylo Mudryk,Left-Winger
+43,Diego Moreira Left-Winger,19.0,"Jun 30, 2028",â¬3.00m,3,Diego Moreira,Left-Winger
+11,Noni Madueke Right-Winger,22.0,"Jun 30, 2030",â¬28.00m,3,Noni Madueke,Right-Winger
+41,Ãngelo Right-Winger,19.0,"Jun 30, 2029",â¬15.00m,2,Angelo,Right-Winger
+-,aaa,17.0,"aaa",aaa,2,Estêvão,Right-Winger
+15,Nicolas Jackson Centre-Forward,23.0,"Jun 30, 2031",â¬35.00m,3,Nicolas Jackson,Centre-Forward
+-,Romelu Lukaku Centre-Forward,31.0,"Jun 30, 2026",â¬30.00m,3,Romelu Lukaku,Centre-Forward
+19,Armando Broja Centre-Forward,22.0,"Jun 30, 2028",â¬22.00m,3,Armando Broja,Centre-Forward
+-,David Datro Fofana Centre-Forward,21.0,"Jun 30, 2029",â¬12.00m,4,David Datro Fofana,Centre-Forward
+36,Deivid Washington Centre-Forward,19.0,"Jun 30, 2030",â¬9.00m,3,Deivid Washington,Centre-Forward
+38,Marc Guiu Centre-Forward,18.0,"Jun 30, 2029",â¬7.50m,3,Marc Guiu,Centre-Forward
