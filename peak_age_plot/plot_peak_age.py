@@ -50,7 +50,7 @@ def plot_peak_age(df, club_name):
     plt.xlabel('Age')
     plt.ylabel('Name')
     plt.title(f'{club_name} squad compared to peak age across positions')
-    plt.legend(loc='upper right')
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
 
     # Show plot
     plt.gca().invert_yaxis()
