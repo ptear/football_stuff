@@ -54,5 +54,5 @@ def plot_peak_age(df, club_name):
 
     # Show plot
     plt.gca().invert_yaxis()
-    plt.savefig(f"{club_name.replace(' ', '_')}.png")
+    plt.savefig(f"{club_name.replace(' ', '_')}.png", bbox_inches='tight')
     plt.show()
