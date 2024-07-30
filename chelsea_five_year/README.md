@@ -28,7 +28,7 @@ Then, add any rows of players that are not in the original data that you know of
 #### 4. Plot the data
 Read in the modified csv, then use the plot_peak_age function (https://github.com/ptear/football_stuff/blob/main/peak_age_plot/plot_peak_age.py).
 
-In the functioon we:
+In the function we:
 - define the peak age bands
 - plot each position group at a time
 - use fill between to create the peak age boxes (using alpha to make the box translucent)
