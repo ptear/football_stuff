@@ -1,31 +1,31 @@
-#,Player,Age,Contract,Market value,x,Name,Position
-1.0,Alisson Goalkeeper,31.0,"Jun 30, 2027",â¬28.00m,2,Alisson,Goalkeeper
-62.0,CaoimhÃ­n Kelleher Goalkeeper,25.0,"Jun 30, 2026",â¬20.00m,3,CaoimhÃ­n Kelleher,Goalkeeper
-56.0,Vitezslav Jaros Goalkeeper,23.0,"Jun 30, 2025",â¬5.00m,3,Vitezslav Jaros,Goalkeeper
-5.0,Ibrahima KonatÃ© Centre-Back,25.0,"Jun 30, 2026",â¬45.00m,3,Ibrahima KonatÃ©,Centre-Back
-4.0,Virgil van Dijk Centre-Back,33.0,"Jun 30, 2025",â¬30.00m,4,Virgil van Dijk,Centre-Back
-2.0,Joe Gomez Centre-Back,27.0,"Jun 30, 2027",â¬28.00m,3,Joe Gomez,Centre-Back
-78.0,Jarell Quansah Centre-Back,21.0,"Jun 30, 2027",â¬22.00m,3,Jarell Quansah,Centre-Back
-72.0,Sepp van den Berg Centre-Back,22.0,"Jun 30, 2026",â¬12.00m,5,Sepp van den Berg,Centre-Back
-47.0,Nathaniel Phillips Centre-Back,27.0,"Jun 30, 2025",â¬3.50m,3,Nathaniel Phillips,Centre-Back
-46.0,Rhys Williams Centre-Back,23.0,"Jun 30, 2026",â¬1.80m,3,Rhys Williams,Centre-Back
-26.0,Andrew Robertson Left-Back,30.0,"Jun 30, 2026",â¬30.00m,3,Andrew Robertson,Left-Back
-21.0,Konstantinos Tsimikas Left-Back,28.0,"Jun 30, 2027",â¬22.00m,3,Konstantinos Tsimikas,Left-Back
-66.0,Trent Alexander-Arnold Right-Back,25.0,"Jun 30, 2025",â¬70.00m,3,Trent Alexander-Arnold,Right-Back
-84.0,Conor Bradley Right-Back,21.0,"Jun 30, 2027",â¬15.00m,3,Conor Bradley,Right-Back
-3.0,Wataru Endo Defensive-Midfield,31.0,"Jun 30, 2027",â¬13.00m,3,Wataru Endo,Defensive-Midfield
-43.0,Stefan Bajcetic Defensive-Midfield,19.0,"Jun 30, 2027",â¬11.00m,3,Stefan Bajcetic,Defensive-Midfield
-80.0,Tyler Morton Defensive-Midfield,21.0,-,â¬8.00m,3,Tyler Morton,Defensive-Midfield
-8.0,Dominik Szoboszlai Central-Midfield,23.0,"Jun 30, 2028",â¬75.00m,3,Dominik Szoboszlai,Central-Midfield
-10.0,Alexis Mac Allister Central-Midfield,25.0,"Jun 30, 2028",â¬75.00m,4,Alexis Mac Allister,Central-Midfield
-17.0,Curtis Jones Central-Midfield,23.0,"Jun 30, 2027",â¬35.00m,3,Curtis Jones,Central-Midfield
-19.0,Harvey Elliott Central-Midfield,21.0,"Jun 30, 2027",â¬35.00m,3,Harvey Elliott,Central-Midfield
-38.0,Ryan Gravenberch Central-Midfield,22.0,"Jun 30, 2028",â¬35.00m,3,Ryan Gravenberch,Central-Midfield
-42.0,Bobby Clark Central-Midfield,19.0,"Jun 30, 2028",â¬1.00m,3,Bobby Clark,Central-Midfield
-28.0,FÃ¡bio Carvalho Attacking-Midfield,21.0,"Jun 30, 2027",â¬14.00m,3,FÃ¡bio Carvalho,Attacking-Midfield
-7.0,Luis DÃ­az Left-Winger,27.0,"Jun 30, 2027",â¬75.00m,3,Luis DÃ­az,Left-Winger
-18.0,Cody Gakpo Left-Winger,25.0,"Jun 30, 2028",â¬55.00m,3,Cody Gakpo,Left-Winger
-20.0,Diogo Jota Left-Winger,27.0,"Jun 30, 2027",â¬50.00m,3,Diogo Jota,Left-Winger
-11.0,Mohamed Salah Right-Winger,32.0,"Jun 30, 2025",â¬55.00m,3,Mohamed Salah,Right-Winger
-50.0,Ben Doak Right-Winger,18.0,-,â¬10.00m,3,Ben Doak,Right-Winger
-9.0,Darwin NÃºÃ±ez Centre-Forward,25.0,"Jun 30, 2028",â¬70.00m,3,Darwin NÃºÃ±ez,Centre-Forward
+#,Player,Age,Contract,Market value,Name,Position
+1.0,Alisson Goalkeeper,31.0,"Jun 30, 2027",â¬28.00m,Alisson,Goalkeeper
+62.0,CaoimhÃ­n Kelleher Goalkeeper,25.0,"Jun 30, 2026",â¬20.00m,CaoimhÃ­n Kelleher,Goalkeeper
+56.0,Vitezslav Jaros Goalkeeper,23.0,"Jun 30, 2025",â¬5.00m,Vitezslav Jaros,Goalkeeper
+5.0,Ibrahima KonatÃ© Centre-Back,25.0,"Jun 30, 2026",â¬45.00m,Ibrahima KonatÃ©,Centre-Back
+4.0,Virgil van Dijk Centre-Back,33.0,"Jun 30, 2025",â¬30.00m,Virgil van Dijk,Centre-Back
+2.0,Joe Gomez Centre-Back,27.0,"Jun 30, 2027",â¬28.00m,Joe Gomez,Centre-Back
+78.0,Jarell Quansah Centre-Back,21.0,"Jun 30, 2027",â¬22.00m,Jarell Quansah,Centre-Back
+72.0,Sepp van den Berg Centre-Back,22.0,"Jun 30, 2026",â¬12.00m,Sepp van den Berg,Centre-Back
+47.0,Nathaniel Phillips Centre-Back,27.0,"Jun 30, 2025",â¬3.50m,Nathaniel Phillips,Centre-Back
+46.0,Rhys Williams Centre-Back,23.0,"Jun 30, 2026",â¬1.80m,Rhys Williams,Centre-Back
+26.0,Andrew Robertson Left-Back,30.0,"Jun 30, 2026",â¬30.00m,Andrew Robertson,Left-Back
+21.0,Konstantinos Tsimikas Left-Back,28.0,"Jun 30, 2027",â¬22.00m,Konstantinos Tsimikas,Left-Back
+66.0,Trent Alexander-Arnold Right-Back,25.0,"Jun 30, 2025",â¬70.00m,Trent Alexander-Arnold,Right-Back
+84.0,Conor Bradley Right-Back,21.0,"Jun 30, 2027",â¬15.00m,Conor Bradley,Right-Back
+3.0,Wataru Endo Defensive-Midfield,31.0,"Jun 30, 2027",â¬13.00m,Wataru Endo,Defensive-Midfield
+43.0,Stefan Bajcetic Defensive-Midfield,19.0,"Jun 30, 2027",â¬11.00m,Stefan Bajcetic,Defensive-Midfield
+80.0,Tyler Morton Defensive-Midfield,21.0,-,â¬8.00m,Tyler Morton,Defensive-Midfield
+8.0,Dominik Szoboszlai Central-Midfield,23.0,"Jun 30, 2028",â¬75.00m,Dominik Szoboszlai,Central-Midfield
+10.0,Alexis Mac Allister Central-Midfield,25.0,"Jun 30, 2028",â¬75.00m,Alexis Mac Allister,Central-Midfield
+17.0,Curtis Jones Central-Midfield,23.0,"Jun 30, 2027",â¬35.00m,Curtis Jones,Central-Midfield
+19.0,Harvey Elliott Central-Midfield,21.0,"Jun 30, 2027",â¬35.00m,Harvey Elliott,Central-Midfield
+38.0,Ryan Gravenberch Central-Midfield,22.0,"Jun 30, 2028",â¬35.00m,Ryan Gravenberch,Central-Midfield
+42.0,Bobby Clark Central-Midfield,19.0,"Jun 30, 2028",â¬1.00m,Bobby Clark,Central-Midfield
+28.0,FÃ¡bio Carvalho Attacking-Midfield,21.0,"Jun 30, 2027",â¬14.00m,FÃ¡bio Carvalho,Attacking-Midfield
+7.0,Luis DÃ­az Left-Winger,27.0,"Jun 30, 2027",â¬75.00m,Luis DÃ­az,Left-Winger
+18.0,Cody Gakpo Left-Winger,25.0,"Jun 30, 2028",â¬55.00m,Cody Gakpo,Left-Winger
+20.0,Diogo Jota Left-Winger,27.0,"Jun 30, 2027",â¬50.00m,Diogo Jota,Left-Winger
+11.0,Mohamed Salah Right-Winger,32.0,"Jun 30, 2025",â¬55.00m,Mohamed Salah,Right-Winger
+50.0,Ben Doak Right-Winger,18.0,-,â¬10.00m,Ben Doak,Right-Winger
+9.0,Darwin NÃºÃ±ez Centre-Forward,25.0,"Jun 30, 2028",â¬70.00m,Darwin NÃºÃ±ez,Centre-Forward

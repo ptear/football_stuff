@@ -23,10 +23,9 @@ def plot_peak_age(df, club_name):
     plt.figure(figsize=(15, 10))
     sns.set_theme(style="whitegrid")
 
-    # Adjust y positions to add padding
-    y_positions = np.arange(len(df)) + 0.5
+    y_positions = np.arange(len(df))
 
-    # Plot the players' ages with adjusted y positions
+    # Plot the players' ages
     for i, (position, group) in enumerate(df.groupby('Position')):
         idx = group.index
         y_vals = y_positions[idx]
