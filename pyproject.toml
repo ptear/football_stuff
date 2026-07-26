@@ -17,6 +17,7 @@ dependencies = [
     "scipy>=1.18.0",
     "plotly>=6.9.0",
     "nbformat>=5.10.4",
+    "soccerdata>=1.9.1",
 ]
 
 [dependency-groups]

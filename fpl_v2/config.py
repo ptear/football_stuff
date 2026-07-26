@@ -24,11 +24,8 @@ FPL_API_BASE = "https://fantasy.premierleague.com/api"
 # in-season snapshots of our own.
 VAASTAV_BASE = "https://raw.githubusercontent.com/vaastav/Fantasy-Premier-League/master/data"
 VAASTAV_SEASON = "2025-26"
-UNDERSTAT_LEAGUE = "EPL"
+UNDERSTAT_LEAGUE = "ENG-Premier League"  # soccerdata's league key, not understat's own naming
 UNDERSTAT_SEASON = "2025"             # understat labels a season by its start year (2025 == 2025/26)
-# Manually downloaded understat league table (season aggregate, one row per team,
-# semicolon-separated) placed in data/raw. Used for the defensive xGA signal.
-UNDERSTAT_LEAGUE_CSV = "league-chemp.csv"
 HTTP_HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; fpl_v2/0.1)"}
 
 # --- Position encoding (FPL element_type -> short code) ----------------------
@@ -44,11 +41,27 @@ POINTS_FOR_ASSIST = 3                 # was hardcoded as *3 in v1; now configura
 # Number of league games used to prorate a season-long clean-sheet expectation.
 GAMES_PER_SEASON = 38
 
+# --- Appearance points (2025-26 rules) ---------------------------------------
+# Carried forward as last season's actual total, not reprojected — see appearances.py.
+APPEARANCE_POINTS_SHORT = 1           # 1-59 minutes in a match
+APPEARANCE_POINTS_FULL = 2            # 60+ minutes in a match
+
 # --- Goalkeeper scoring ------------------------------------------------------
-# Appearance points are omitted (as in the outfield model) to keep GK and outfield
-# xPoints on the same scale — see goalkeepers.py.
 SAVES_PER_POINT = 3                   # 1 pt per 3 saves
-GOALS_CONCEDED_PER_NEG_POINT = 2      # -1 pt per 2 goals conceded (GK/DEF)
+
+# --- Team defensive signal thresholds (real per-match xG conceded) -----------
+# Both signals are threshold counts on a team's actual per-match xG conceded
+# (see defense.py / sources_understat_match.py), not a probability model:
+#   - clean sheet: counted whenever a match's xG conceded is below this
+#   - bad defensive game: counted whenever a match's xG conceded is above this,
+#     flat regardless of how much higher — a 4-0 and a 6-0 both count as one bad
+#     game, so a handful of blowouts can't dominate the rate.
+CLEAN_SHEET_XGA_THRESHOLD = 1.0
+BAD_DEFENSIVE_GAME_XGA_THRESHOLD = 2.0
+# Points deducted per expected "bad defensive game", by position (0 = doesn't
+# apply). Real FPL docks GK/DEF -1 per 2 goals conceded; this is a threshold-count
+# approximation of that rather than a continuous per-goal penalty.
+POINTS_FOR_CONCEDED = {"GK": 1, "DEF": 1, "MID": 0, "FWD": 0}
 
 # --- Defensive contribution (2025-26 rules) ----------------------------------
 # 2 pts in a match if a threshold of defensive actions is hit. Defenders count

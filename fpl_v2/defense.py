@@ -1,18 +1,22 @@
-"""Team defensive strength -> expected clean sheets (xClean).
+"""Team defensive signals: expected clean sheets and expected "bad defensive games".
 
-`xClean` is the expected number of clean sheets a team keeps over a season; the
-xPoints model prorates it by each player's appearance share.
+Both are threshold counts on a team's real per-match xG conceded (from
+`sources_understat_match.team_match_xg`), not a probability model — see
+config.CLEAN_SHEET_XGA_THRESHOLD / BAD_DEFENSIVE_GAME_XGA_THRESHOLD for the exact
+rule. Rates are computed over whatever matches are available, then projected across
+config.GAMES_PER_SEASON games, so this still works on a partial season.
 
-Primary source is understat team xGA (manual league-table download — see
-sources_understat). Fallback derives team season xGA from FPL
-`expected_goals_conceded`. Either way, expected clean sheets come from a Poisson
-model: P(clean sheet) = P(0 conceded) = exp(-xGA_per_game).
+`xBadGames` feeds the GK/DEF goals-conceded penalty (config.POINTS_FOR_CONCEDED).
+
+Falls back to a Poisson estimate from FPL's own season-total `expected_goals_conceded`
+when config.DEFENSE_USE_UNDERSTAT is off (no `xBadGames` in that path — it was never
+tracked before the per-match source).
 """
 
 import numpy as np
 import pandas as pd
 
-from fpl_v2 import config, sources_fpl, sources_understat
+from fpl_v2 import config, sources_fpl, sources_understat_match
 
 
 def _team_season_xga_fpl() -> pd.Series:
@@ -28,35 +32,43 @@ def _team_season_xga_fpl() -> pd.Series:
     return xga
 
 
-def _xclean_from_xga(xga_per_game: pd.Series) -> pd.Series:
-    """Poisson expected clean sheets over a season from per-game xGA."""
-    return config.GAMES_PER_SEASON * np.exp(-xga_per_game)
-
-
 def _xclean_fpl() -> pd.DataFrame:
-    """Fallback xClean per team from FPL-derived season xGA."""
-    xga = _team_season_xga_fpl()
-    xclean = _xclean_from_xga(xga / config.GAMES_PER_SEASON)
+    """Fallback xClean per team from FPL-derived season xGA (Poisson: P(0 conceded) = exp(-xGA_per_game))."""
+    xga_per_game = _team_season_xga_fpl() / config.GAMES_PER_SEASON
+    xclean = config.GAMES_PER_SEASON * np.exp(-xga_per_game)
     return xclean.rename("xClean").reset_index()
 
 
-def _xclean_understat(season_xga: pd.DataFrame) -> pd.DataFrame:
-    """xClean per team from understat season xGA (Poisson on per-game xGA)."""
-    per_game = season_xga["xGA"] / season_xga["matches"]
-    xclean = _xclean_from_xga(per_game)
-    out = season_xga[["team_name"]].copy()
-    out["xClean"] = xclean.values
-    return out
+def team_defensive_rates(season: str = None, refresh: bool = False) -> pd.DataFrame:
+    """Per-team clean-sheet and bad-defensive-game rates from real per-match xG conceded.
+
+    Args:
+        season: understat season label, passed through to
+            sources_understat_match.team_match_xg (defaults to config.UNDERSTAT_SEASON).
+        refresh: force re-download instead of using the cached match data.
+
+    Returns:
+        DataFrame[team_name, xClean, xBadGames], both counted from a threshold on
+        each match's xG conceded, then projected across config.GAMES_PER_SEASON games.
+    """
+    matches = sources_understat_match.team_match_xg(season, refresh=refresh)
+    xga = matches.groupby("team_name")["xG_against"]
+    games = xga.size()
+    clean_games = xga.apply(lambda s: (s < config.CLEAN_SHEET_XGA_THRESHOLD).sum())
+    bad_games = xga.apply(lambda s: (s > config.BAD_DEFENSIVE_GAME_XGA_THRESHOLD).sum())
+
+    out = pd.DataFrame({"games": games, "clean_games": clean_games, "bad_games": bad_games})
+    out["xClean"] = out["clean_games"] / out["games"] * config.GAMES_PER_SEASON
+    out["xBadGames"] = out["bad_games"] / out["games"] * config.GAMES_PER_SEASON
+    return out[["xClean", "xBadGames"]].reset_index()
 
 
 def team_expected_clean_sheets(refresh: bool = False) -> pd.DataFrame:
     """Return DataFrame[team_name, xClean].
 
-    Uses understat team xGA when available and enabled, otherwise the FPL-derived
-    fallback.
+    Uses the per-match threshold-count rate when config.DEFENSE_USE_UNDERSTAT is
+    on, otherwise the FPL-derived Poisson fallback.
     """
     if config.DEFENSE_USE_UNDERSTAT:
-        season_xga = sources_understat.team_season_xga()
-        if season_xga is not None:
-            return _xclean_understat(season_xga)
+        return team_defensive_rates(refresh=refresh)[["team_name", "xClean"]]
     return _xclean_fpl()
