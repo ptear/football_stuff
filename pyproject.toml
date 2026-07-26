@@ -15,10 +15,13 @@ dependencies = [
     "unidecode",
     "pulp",
     "scipy>=1.18.0",
+    "plotly>=6.9.0",
+    "nbformat>=5.10.4",
 ]
 
 [dependency-groups]
 dev = [
+    "kaleido>=1.3.0",
     "pytest>=9.1.1",
 ]
 

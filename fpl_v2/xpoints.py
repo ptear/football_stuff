@@ -16,8 +16,9 @@ import pandas as pd
 from fpl_v2 import config, defense
 
 
-def compute(df: pd.DataFrame, xclean: pd.DataFrame = None) -> pd.DataFrame:
-    """Return `df` with an `xClean` and `xPoints` column added.
+def breakdown(df: pd.DataFrame, xclean: pd.DataFrame = None) -> pd.DataFrame:
+    """Return `df` with `xClean` and the four xPoints component columns added:
+    `goal_points`, `assist_points`, `clean_points`, `defcon_points`. These sum to `xPoints`.
 
     Args:
         df: player feature table (needs position, xG, xAG, s90, team_name).
@@ -32,13 +33,22 @@ def compute(df: pd.DataFrame, xclean: pd.DataFrame = None) -> pd.DataFrame:
     pts_goal = df["position"].map(config.POINTS_FOR_GOAL)
     pts_clean = df["position"].map(config.POINTS_FOR_CLEAN)
 
+    df["goal_points"] = df["xG"] * pts_goal
+    df["assist_points"] = df["xAG"] * config.POINTS_FOR_ASSIST
+    df["clean_points"] = df["xClean"] * pts_clean * (df["s90"] / config.GAMES_PER_SEASON)
     # Defensive-contribution points are already expected points; add if present.
-    defcon = df["expected_defcon_points"] if "expected_defcon_points" in df else 0.0
+    df["defcon_points"] = df["expected_defcon_points"] if "expected_defcon_points" in df else 0.0
+    return df
 
-    df["xPoints"] = (
-        df["xG"] * pts_goal
-        + df["xAG"] * config.POINTS_FOR_ASSIST
-        + df["xClean"] * pts_clean * (df["s90"] / config.GAMES_PER_SEASON)
-        + defcon
-    )
+
+def compute(df: pd.DataFrame, xclean: pd.DataFrame = None) -> pd.DataFrame:
+    """Return `df` with an `xClean` and `xPoints` column added (plus the component
+    columns from `breakdown`).
+
+    Args:
+        df: player feature table (needs position, xG, xAG, s90, team_name).
+        xclean: DataFrame[team_name, xClean]. Defaults to defense.team_expected_clean_sheets().
+    """
+    df = breakdown(df, xclean)
+    df["xPoints"] = df["goal_points"] + df["assist_points"] + df["clean_points"] + df["defcon_points"]
     return df
