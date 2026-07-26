@@ -16,6 +16,12 @@ from fpl_v2.optimize import SquadResult
 # Columns the optimiser needs; the shared schema for the outfield + GK pool.
 _POOL_COLS = ["code", "web_name", "position", "team_name", "cost", "xPoints"]
 
+# Slim summary columns: identity + the direct xPoints constituents (not the
+# intermediate signals used to derive them, e.g. xG/xClean/expected_defcon_points).
+_SUMMARY_COLS = ["web_name", "team_name", "position", "cost",
+                 "goal_points", "assist_points", "clean_points", "conceded_points",
+                 "defcon_points", "appearance_points", "bonus_points", "xPoints"]
+
 
 def build_forecast(refresh: bool = False, weights: dict = None,
                    defensive_contribution: bool = True) -> pd.DataFrame:
@@ -67,7 +73,9 @@ def run(refresh: bool = False, weights: dict = None,
     Args:
         refresh: force re-pull of live data.
         weights: season blend weights (defaults to config).
-        save: if True, write the outfield forecast to data/processed/forecast.csv.
+        save: if True, write the outfield forecast to data/processed/forecast.csv,
+            plus a slim data/processed/forecast_summary.csv (surname, team, position,
+            cost and the xPoints constituents only).
 
     Returns:
         (outfield forecast table, best SquadResult over the GK+outfield pool).
@@ -75,8 +83,10 @@ def run(refresh: bool = False, weights: dict = None,
     forecast = build_forecast(refresh=refresh, weights=weights)
     if save:
         config.PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-        forecast.sort_values("xPoints", ascending=False).to_csv(
-            config.PROCESSED_DIR / "forecast.csv", index=False
+        ranked = forecast.sort_values("xPoints", ascending=False)
+        ranked.to_csv(config.PROCESSED_DIR / "forecast.csv", index=False)
+        ranked[_SUMMARY_COLS].rename(columns={"web_name": "surname"}).to_csv(
+            config.PROCESSED_DIR / "forecast_summary.csv", index=False
         )
     pool = pd.concat([forecast[_POOL_COLS], goalkeeper_pool(refresh=refresh)],
                      ignore_index=True)

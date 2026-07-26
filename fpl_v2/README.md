@@ -199,9 +199,10 @@ xPoints = 2.94*6 + 1.75*3 + 22.0*4*(30.56/38) - 3.0*1*(30.56/38) + 25.74 + 62.0 
 `xpoints.breakdown()` computes these same seven terms as their own columns
 (`goal_points`, `assist_points`, `clean_points`, `conceded_points`, `defcon_points`,
 `appearance_points`, `bonus_points`, summing to `xPoints`) — used by the defender
-xPoints-breakdown chart in `notebooks/defender_points_breakdown.ipynb`, but not
-currently persisted to `forecast.csv` (only `pipeline.run(save=True)`'s output
-columns are).
+xPoints-breakdown chart in `notebooks/defender_points_breakdown.ipynb`, and persisted
+(alongside identity + `xPoints`, but none of the intermediate signals like `xG`/
+`xClean`/`expected_defcon_points`) to `data/processed/forecast_summary.csv` by
+`pipeline.run(save=True)` — see Usage below.
 
 ### Defensive contribution (`defcon.py`)
 
@@ -226,6 +227,14 @@ forecast, squad = pipeline.run(save=True)   # refresh=True to re-pull live data
 squad.formation, squad.total_cost / 10, squad.captain["web_name"]
 forecast.sort_values("xPoints", ascending=False).head(20)
 ```
+
+`save=True` writes two files to `data/processed/`:
+- `forecast.csv` — the full outfield player table.
+- `forecast_summary.csv` — a slim version for quick scanning/sharing: `surname`
+  (`web_name`), `team_name`, `position`, `cost`, and the seven direct `xPoints`
+  constituents (`goal_points`, `assist_points`, `clean_points`, `conceded_points`,
+  `defcon_points`, `appearance_points`, `bonus_points`) plus `xPoints` itself — no
+  intermediate signals (`xG`, `xClean`, `expected_defcon_points`, etc.).
 
 Config-drive everything else: edit scoring in `config.POINTS_*`, formations in
 `config.FORMATIONS` (including "non-nailed" partial-budget variants), blend across seasons
