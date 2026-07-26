@@ -56,11 +56,7 @@ so we accumulate our own multi-season history rather than depending on a third-p
   probability under Poisson is only ~41%). Retuned by grid search against every team's
   real 2025-26 outcomes (actual clean sheets; actual games with 3+ conceded), minimizing
   squared error across all 20 teams — see the comment above the constants in `config.py`
-  for the numbers. Sanity-checked against real `total_points`: before retuning, Arsenal's
-  historically dominant defense (33 real xGA, most bad-game-free season in the league)
-  got so much clean-sheet credit that the goalkeeper (Raya, real 162 points last season)
-  out-ranked every outfield player and won the optimiser's captaincy — a real calibration
-  bug, not a coding one. After retuning, the captain is Haaland, as expected.
+  for the numbers, and the sanity check below for the before/after evidence.
 - **Appearance points are carried forward as last season's actual total, not
   reprojected** (`appearances.py`) — same treatment as `xG`/`xAG`. This assumes a
   player's role next season mirrors last season, which is deliberate: it's a
@@ -81,6 +77,33 @@ so we accumulate our own multi-season history rather than depending on a third-p
 - **Preseason hybrid**: the live API currently serves next season's prices/teams with last
   season's final xG in one payload — ideal for planning, but the xG resets when GW1 nears,
   which is why the snapshot matters.
+
+### Sanity check: xPoints vs real `total_points`
+
+Before the threshold retuning above, Arsenal's historically dominant defense (33 real
+xGA, the league's most bad-game-free season) got so much clean-sheet credit that the
+goalkeeper (Raya, real 162 points last season) out-ranked every outfield player and won
+the optimiser's captaincy — a real calibration bug, not a coding one. Checking each
+player's projected `xPoints` against their actual 2025-26 `total_points` caught it:
+
+| Player | xPoints (before) | xPoints (after retuning + bonus) | Real `total_points` |
+|---|---|---|---|
+| Haaland | 178.0 | 221.0 | 239 |
+| B.Fernandes | 180.4 | 218.7 | 235 |
+| Gabriel | 191.8 | 209.0 | 209 |
+| Virgil | 191.9 | 198.9 | 175 |
+| Senesi | 179.7 | 188.9 | 175 |
+| Raya | 192.3 | 187.7 | 162 |
+| Guéhi | 177.9 | 174.4 | 179 |
+
+Before: Raya's projection (192.3) exceeded his own real total by 30 points and topped
+elite attackers who scored far more in reality (Haaland real 239, projected only 178).
+After retuning the clean-sheet/bad-game thresholds and adding bonus points (which skews
+toward goal involvements — see below), the ordering lines up with reality much more
+closely, and **the optimiser's captain changes from Raya to Haaland**, as it should. This
+isn't an exact match by design — `xPoints` is a forward-looking projection for next
+season, not a reproduction of last season's actual (bonus-affected, luck-affected) total
+— but the gap shouldn't be this lopsided, and now it isn't.
 
 ## Layout
 
