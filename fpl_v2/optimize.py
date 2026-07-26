@@ -30,15 +30,18 @@ class SquadResult:
         return self.players.set_index("code").loc[self.captain_code]
 
 
+_POSITIONS = ("GK", "DEF", "MID", "FWD")
+
+
 def _solve_formation(df: pd.DataFrame, name: str, spec: dict,
-                     max_per_club: int) -> SquadResult | None:
+                     budget: int, max_per_club: int) -> SquadResult | None:
     """Solve one formation; return its SquadResult or None if infeasible."""
     codes = df["code"].tolist()
     xp = dict(zip(df["code"], df["xPoints"]))
     cost = dict(zip(df["code"], df["cost"]))
     pos = dict(zip(df["code"], df["position"]))
     club = dict(zip(df["code"], df["team_name"]))
-    squad_size = sum(spec[p] for p in ("DEF", "MID", "FWD"))
+    squad_size = sum(spec.get(p, 0) for p in _POSITIONS)
 
     prob = pulp.LpProblem(f"fpl_{name}", pulp.LpMaximize)
     x = pulp.LpVariable.dicts("x", codes, cat="Binary")   # selected
@@ -47,10 +50,11 @@ def _solve_formation(df: pd.DataFrame, name: str, spec: dict,
     # Objective: captain's xPoints counts twice.
     prob += pulp.lpSum(xp[i] * (x[i] + c[i]) for i in codes)
 
-    prob += pulp.lpSum(cost[i] * x[i] for i in codes) <= spec["budget"]
-    for p in ("DEF", "MID", "FWD"):
-        prob += pulp.lpSum(x[i] for i in codes if pos[i] == p) == spec[p]
+    prob += pulp.lpSum(cost[i] * x[i] for i in codes) <= budget
+    for p in _POSITIONS:
+        prob += pulp.lpSum(x[i] for i in codes if pos[i] == p) == spec.get(p, 0)
     prob += pulp.lpSum(x[i] for i in codes) == squad_size
+    # Max per club — now counts the goalkeeper too, since GKs are in the pool.
     for cl in set(club.values()):
         prob += pulp.lpSum(x[i] for i in codes if club[i] == cl) <= max_per_club
     prob += pulp.lpSum(c[i] for i in codes) == 1          # exactly one captain
@@ -73,22 +77,25 @@ def _solve_formation(df: pd.DataFrame, name: str, spec: dict,
     )
 
 
-def optimize(df: pd.DataFrame, formations: dict = None,
+def optimize(df: pd.DataFrame, formations: dict = None, budget: int = None,
              max_per_club: int = config.MAX_PER_CLUB) -> SquadResult:
     """Return the best squad across all formations by total xPoints.
 
     Args:
-        df: feature table with xPoints, cost, position, team_name, code.
-        formations: {name: {DEF, MID, FWD, budget}}. Defaults to config.FORMATIONS.
-        max_per_club: cap on players from any one club.
+        df: player pool with xPoints, cost, position, team_name, code — must include
+            goalkeepers for the GK slot to be fillable.
+        formations: {name: {GK, DEF, MID, FWD}}. Defaults to config.FORMATIONS.
+        budget: XI budget in FPL tenths. Defaults to config.SQUAD_BUDGET.
+        max_per_club: cap on players from any one club (counts the GK).
 
     Raises:
         ValueError: if no formation is feasible.
     """
     formations = formations or config.FORMATIONS
+    budget = config.SQUAD_BUDGET if budget is None else budget
     results = [
         r for name, spec in formations.items()
-        if (r := _solve_formation(df, name, spec, max_per_club)) is not None
+        if (r := _solve_formation(df, name, spec, budget, max_per_club)) is not None
     ]
     if not results:
         raise ValueError("no feasible squad for any formation")

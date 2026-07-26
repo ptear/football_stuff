@@ -32,9 +32,13 @@ def compute(df: pd.DataFrame, xclean: pd.DataFrame = None) -> pd.DataFrame:
     pts_goal = df["position"].map(config.POINTS_FOR_GOAL)
     pts_clean = df["position"].map(config.POINTS_FOR_CLEAN)
 
+    # Defensive-contribution points are already expected points; add if present.
+    defcon = df["expected_defcon_points"] if "expected_defcon_points" in df else 0.0
+
     df["xPoints"] = (
         df["xG"] * pts_goal
         + df["xAG"] * config.POINTS_FOR_ASSIST
         + df["xClean"] * pts_clean * (df["s90"] / config.GAMES_PER_SEASON)
+        + defcon
     )
     return df

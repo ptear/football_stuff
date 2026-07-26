@@ -19,6 +19,11 @@ UPCOMING_SEASON = "2026-27"          # season the prices/teams belong to
 
 # --- Sources -----------------------------------------------------------------
 FPL_API_BASE = "https://fantasy.premierleague.com/api"
+# vaastav mirror — source for defensive-contribution stats, which the preseason
+# official API wipes at season rollover (see defcon.py). Bridge until we own enough
+# in-season snapshots of our own.
+VAASTAV_BASE = "https://raw.githubusercontent.com/vaastav/Fantasy-Premier-League/master/data"
+VAASTAV_SEASON = "2025-26"
 UNDERSTAT_LEAGUE = "EPL"
 UNDERSTAT_SEASON = "2025"             # understat labels a season by its start year (2025 == 2025/26)
 # Manually downloaded understat league table (season aggregate, one row per team,
@@ -38,6 +43,22 @@ POINTS_FOR_ASSIST = 3                 # was hardcoded as *3 in v1; now configura
 
 # Number of league games used to prorate a season-long clean-sheet expectation.
 GAMES_PER_SEASON = 38
+
+# --- Goalkeeper scoring ------------------------------------------------------
+# Appearance points are omitted (as in the outfield model) to keep GK and outfield
+# xPoints on the same scale — see goalkeepers.py.
+SAVES_PER_POINT = 3                   # 1 pt per 3 saves
+GOALS_CONCEDED_PER_NEG_POINT = 2      # -1 pt per 2 goals conceded (GK/DEF)
+
+# --- Defensive contribution (2025-26 rules) ----------------------------------
+# 2 pts in a match if a threshold of defensive actions is hit. Defenders count
+# CBIT (clearances+blocks+interceptions + tackles); mid/fwd add ball recoveries.
+DEFCON_POINTS = 2
+DEFCON = {
+    "DEF": {"threshold": 10, "recoveries": False},
+    "MID": {"threshold": 12, "recoveries": True},
+    "FWD": {"threshold": 12, "recoveries": True},
+}
 
 # --- Penalty-taker bonus -----------------------------------------------------
 # A nailed penalty taker earns extra xG on top of open-play npxG. Derived, not
@@ -62,16 +83,24 @@ APPLY_PENALTY_BONUS = False
 BLEND_WEIGHTS = {CURRENT_SEASON: 1.0}
 
 # --- Optimizer ---------------------------------------------------------------
-SQUAD_SIZE = 10                       # outfield players selected (GK handled separately)
 MAX_PER_CLUB = 3
 
-# Formation -> per-position caps + budget (FPL tenths). Budget excludes the GK
-# and bench allowance, matching v1's £78.5m for the 10 starting outfielders.
+# Budget (FPL tenths) for the starting XI including the goalkeeper. The rest of the
+# £100.0m squad funds the 4 bench players, bought cheaply outside the optimiser
+# (~£17.5m reserved here). Tune to taste — v1 used 785 for 10 outfield with the GK
+# picked separately; folding the GK in raises it by roughly a keeper's price.
+SQUAD_BUDGET = 825
+GK_MIN_MINUTES = 1000                 # ignore backup keepers when building the pool
+
+# Formation -> per-position counts for the full XI (1 GK + 10 outfield).
 FORMATIONS = {
-    "3-5-2": {"DEF": 3, "MID": 5, "FWD": 2, "budget": 785},
-    "3-4-3": {"DEF": 3, "MID": 4, "FWD": 3, "budget": 785},
-    "4-4-2": {"DEF": 4, "MID": 4, "FWD": 2, "budget": 785},
-    "4-5-1": {"DEF": 4, "MID": 5, "FWD": 1, "budget": 785},
+    "3-4-3": {"GK": 1, "DEF": 3, "MID": 4, "FWD": 3},
+    "3-5-2": {"GK": 1, "DEF": 3, "MID": 5, "FWD": 2},
+    "4-3-3": {"GK": 1, "DEF": 4, "MID": 3, "FWD": 3},
+    "4-4-2": {"GK": 1, "DEF": 4, "MID": 4, "FWD": 2},
+    "4-5-1": {"GK": 1, "DEF": 4, "MID": 5, "FWD": 1},
+    "5-3-2": {"GK": 1, "DEF": 5, "MID": 3, "FWD": 2},
+    "5-4-1": {"GK": 1, "DEF": 5, "MID": 4, "FWD": 1},
 }
 
 # --- Flags -------------------------------------------------------------------

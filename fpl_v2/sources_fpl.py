@@ -17,15 +17,17 @@ from fpl_v2 import cache, config
 _ELEMENT_COLS = [
     "code", "id", "web_name", "first_name", "second_name",
     "element_type", "team", "now_cost", "status", "chance_of_playing_next_round",
-    "minutes", "total_points",
+    "minutes", "total_points", "starts",
     "expected_goals", "expected_assists", "expected_goal_involvements",
     "expected_goals_conceded", "expected_goals_per_90",
+    "saves", "saves_per_90", "goals_conceded", "goals_conceded_per_90",
     "penalties_order", "direct_freekicks_order", "corners_and_indirect_freekicks_order",
 ]
 
 _NUMERIC_COLS = [
     "expected_goals", "expected_assists", "expected_goal_involvements",
     "expected_goals_conceded", "expected_goals_per_90",
+    "saves", "saves_per_90", "goals_conceded", "goals_conceded_per_90", "starts",
 ]
 
 
