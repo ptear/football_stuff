@@ -56,8 +56,14 @@ SAVES_PER_POINT = 3                   # 1 pt per 3 saves
 #   - bad defensive game: counted whenever a match's xG conceded is above this,
 #     flat regardless of how much higher — a 4-0 and a 6-0 both count as one bad
 #     game, so a handful of blowouts can't dominate the rate.
-CLEAN_SHEET_XGA_THRESHOLD = 1.0
-BAD_DEFENSIVE_GAME_XGA_THRESHOLD = 2.0
+# Retuned (2025-26 data) by grid search against each team's real match outcomes —
+# actual clean sheets, and actual games with 3+ goals conceded — minimizing squared
+# error across all 20 teams. A naive 1.0 / 2.0 cutoff overstates both league-wide
+# (mean +3.15 clean sheets, +1.85 bad games per team) since any match sitting below
+# the clean-sheet cutoff gets full weight regardless of how close it is (a match at
+# xGA=0.9 still only has ~41% true clean-sheet probability under Poisson).
+CLEAN_SHEET_XGA_THRESHOLD = 0.8
+BAD_DEFENSIVE_GAME_XGA_THRESHOLD = 2.2
 # Points deducted per expected "bad defensive game", by position (0 = doesn't
 # apply). Real FPL docks GK/DEF -1 per 2 goals conceded; this is a threshold-count
 # approximation of that rather than a continuous per-goal penalty.

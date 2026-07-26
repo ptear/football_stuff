@@ -52,3 +52,24 @@ def test_appearance_points_pass_through():
     out = xpoints.compute(without_appearances, team_rates)
     assert out.loc[0, "appearance_points"] == 0
     assert out.loc[0, "xPoints"] == 0
+
+
+def test_bonus_points_pass_through():
+    """expected_bonus_points (already points, not a rate) is added as-is if present,
+    and defaults to 0 (no NaN) if the column is absent entirely."""
+    team_rates = pd.DataFrame({"team_name": ["A"], "xClean": [0.0], "xBadGames": [0.0]})
+
+    with_bonus = pd.DataFrame([
+        {"code": 1, "position": "FWD", "xG": 0, "xAG": 0, "s90": 0, "team_name": "A",
+         "expected_bonus_points": 43},
+    ])
+    out = xpoints.compute(with_bonus, team_rates)
+    assert out.loc[0, "bonus_points"] == 43
+    assert out.loc[0, "xPoints"] == 43
+
+    without_bonus = pd.DataFrame([
+        {"code": 1, "position": "FWD", "xG": 0, "xAG": 0, "s90": 0, "team_name": "A"},
+    ])
+    out = xpoints.compute(without_bonus, team_rates)
+    assert out.loc[0, "bonus_points"] == 0
+    assert out.loc[0, "xPoints"] == 0

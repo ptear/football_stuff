@@ -9,8 +9,8 @@ the best squad. Set refresh=True to re-pull live data.
 
 import pandas as pd
 
-from fpl_v2 import (appearances, config, defcon, goalkeepers, optimize, overrides,
-                    penalties, players, xpoints)
+from fpl_v2 import (appearances, bonus, config, defcon, goalkeepers, optimize,
+                    overrides, penalties, players, xpoints)
 from fpl_v2.optimize import SquadResult
 
 # Columns the optimiser needs; the shared schema for the outfield + GK pool.
@@ -22,7 +22,7 @@ def build_forecast(refresh: bool = False, weights: dict = None,
     """Build the full player forecast table (xPoints per player).
 
     Order: feature table -> manual overrides -> penalty bonus -> DefCon points ->
-    appearance points -> xPoints.
+    appearance points -> bonus points -> xPoints.
 
     Args:
         defensive_contribution: include expected DefCon points (needs the vaastav source).
@@ -33,6 +33,7 @@ def build_forecast(refresh: bool = False, weights: dict = None,
     if defensive_contribution:
         df = defcon.expected_defcon_points(df, refresh=refresh)
     df = appearances.expected_appearance_points(df, refresh=refresh)
+    df = bonus.expected_bonus_points(df, refresh=refresh)
     df = xpoints.compute(df)
     return df
 

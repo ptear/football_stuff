@@ -1,9 +1,10 @@
-"""vaastav mirror — defensive-contribution stats only.
+"""vaastav mirror — defensive-contribution stats, fixture-level minutes, and bonus points.
 
 The preseason official API zeroes the defensive-actions fields at season rollover,
-so we read them from vaastav's end-of-season players_raw for the baseline season.
-Quarantined here; the rest of the codebase uses the official API. The long-term
-plan is to replace this with our own in-season bootstrap snapshots.
+so we read those (and other last-season-actual signals not worth re-deriving) from
+vaastav's end-of-season data instead. Quarantined here; the rest of the codebase
+uses the official API. The long-term plan is to replace this with our own in-season
+bootstrap snapshots.
 """
 
 import io
@@ -64,3 +65,17 @@ def fixture_minutes(season: str = None, refresh: bool = False) -> pd.DataFrame:
 
     gw["code"] = gw["element"].map(players.set_index("id")["code"])
     return gw[["code", "minutes"]]
+
+
+def bonus_points(season: str = None, refresh: bool = False) -> pd.DataFrame:
+    """Return each player's season-total bonus points for `season`, keyed on `code`.
+
+    Args:
+        season: vaastav season label (defaults to config.VAASTAV_SEASON).
+        refresh: force re-download.
+    """
+    season = season or config.VAASTAV_SEASON
+    base = f"{config.VAASTAV_BASE}/{season}"
+    players = pd.read_csv(io.StringIO(
+        cache.fetch_text(f"{base}/players_raw.csv", f"vaastav_players_{season}.csv", refresh)))
+    return players[["code", "bonus"]].copy()

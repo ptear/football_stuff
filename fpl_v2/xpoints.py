@@ -9,10 +9,12 @@ season xPoints, using the position-dependent scoring weights in config:
             - xBadGames * points_for_conceded[pos] * (s90 / games_per_season)
             + expected_defcon_points
             + expected_appearance_points
+            + expected_bonus_points
 
 The clean-sheet and bad-defensive-game terms are prorated by appearance share
 (s90 / 38) so part-season players aren't credited with a full team's rate.
-`expected_appearance_points` is not reprorated — see appearances.py.
+`expected_appearance_points` and `expected_bonus_points` are not reprorated — see
+appearances.py / bonus.py.
 """
 
 import pandas as pd
@@ -21,9 +23,10 @@ from fpl_v2 import config, defense
 
 
 def breakdown(df: pd.DataFrame, team_rates: pd.DataFrame = None) -> pd.DataFrame:
-    """Return `df` with `xClean`, `xBadGames` and the six xPoints component
+    """Return `df` with `xClean`, `xBadGames` and the seven xPoints component
     columns added: `goal_points`, `assist_points`, `clean_points`,
-    `conceded_points`, `defcon_points`, `appearance_points`. These sum to `xPoints`.
+    `conceded_points`, `defcon_points`, `appearance_points`, `bonus_points`.
+    These sum to `xPoints`.
 
     Args:
         df: player feature table (needs position, xG, xAG, s90, team_name).
@@ -44,10 +47,12 @@ def breakdown(df: pd.DataFrame, team_rates: pd.DataFrame = None) -> pd.DataFrame
     df["assist_points"] = df["xAG"] * config.POINTS_FOR_ASSIST
     df["clean_points"] = df["xClean"] * pts_clean * (df["s90"] / config.GAMES_PER_SEASON)
     df["conceded_points"] = -df["xBadGames"] * pts_conceded * (df["s90"] / config.GAMES_PER_SEASON)
-    # Defensive-contribution and appearance points are already expected points
-    # (not rates), computed upstream by defcon.py / appearances.py; add if present.
+    # Defensive-contribution, appearance and bonus points are already expected
+    # points (not rates), computed upstream by defcon.py / appearances.py / bonus.py;
+    # add if present.
     df["defcon_points"] = df["expected_defcon_points"] if "expected_defcon_points" in df else 0.0
     df["appearance_points"] = df["expected_appearance_points"] if "expected_appearance_points" in df else 0.0
+    df["bonus_points"] = df["expected_bonus_points"] if "expected_bonus_points" in df else 0.0
     return df
 
 
@@ -62,5 +67,6 @@ def compute(df: pd.DataFrame, team_rates: pd.DataFrame = None) -> pd.DataFrame:
     """
     df = breakdown(df, team_rates)
     df["xPoints"] = (df["goal_points"] + df["assist_points"] + df["clean_points"]
-                     + df["conceded_points"] + df["defcon_points"] + df["appearance_points"])
+                     + df["conceded_points"] + df["defcon_points"] + df["appearance_points"]
+                     + df["bonus_points"])
     return df

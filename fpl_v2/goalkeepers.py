@@ -9,16 +9,18 @@ many low-danger shots earns save points AND keeps clean sheets, so high
                + clean_sheet_pts · appearance_share           (4 pts per clean sheet)
                − conceded_pts · bad_game_share                (1 pt per bad defensive game)
                + expected_appearance_points
+               + expected_bonus_points
 
 `xClean` and `xBadGames` both come from the team's real per-match xG conceded (see
-defense.py) — the same defensive signal the outfield model uses. Appearance points
-come from appearances.py — same source, same "carry last season forward as-is"
-treatment as the outfield model, so GK and outfield xPoints stay on one scale.
+defense.py) — the same defensive signal the outfield model uses. Appearance and
+bonus points come from appearances.py / bonus.py — same sources, same "carry last
+season forward as-is" treatment as the outfield model, so GK and outfield xPoints
+stay on one scale.
 """
 
 import pandas as pd
 
-from fpl_v2 import appearances, config, defense, sources_fpl
+from fpl_v2 import appearances, bonus, config, defense, sources_fpl
 
 
 def build(refresh: bool = False) -> pd.DataFrame:
@@ -33,6 +35,7 @@ def build(refresh: bool = False) -> pd.DataFrame:
     gk = gk.merge(rates, on="team_name", how="left")
     gk[["xClean", "xBadGames"]] = gk[["xClean", "xBadGames"]].fillna(0.0)
     gk = appearances.expected_appearance_points(gk, refresh=refresh)
+    gk = bonus.expected_bonus_points(gk, refresh=refresh)
 
     exp_saves = gk["saves_per_90"] * gk["s90"]
 
@@ -41,6 +44,7 @@ def build(refresh: bool = False) -> pd.DataFrame:
         + config.POINTS_FOR_CLEAN["GK"] * gk["xClean"] * (gk["s90"] / config.GAMES_PER_SEASON)
         - config.POINTS_FOR_CONCEDED["GK"] * gk["xBadGames"] * (gk["s90"] / config.GAMES_PER_SEASON)
         + gk["expected_appearance_points"]
+        + gk["expected_bonus_points"]
     )
     return gk
 
@@ -55,5 +59,6 @@ def rank(refresh: bool = False, min_minutes: int = 1000) -> pd.DataFrame:
     gk = build(refresh)
     gk = gk[gk["minutes"] >= min_minutes]
     cols = ["web_name", "team_name", "now_cost", "s90", "saves_per_90",
-            "xClean", "xBadGames", "expected_appearance_points", "GK_xPoints"]
+            "xClean", "xBadGames", "expected_appearance_points",
+            "expected_bonus_points", "GK_xPoints"]
     return gk.sort_values("GK_xPoints", ascending=False)[cols].reset_index(drop=True)

@@ -20,6 +20,9 @@ Everything except team match xG comes from the **official FPL API**
   season-total `expected_goals_conceded` when `config.DEFENSE_USE_UNDERSTAT` is off.
 - **Appearance points** — real per-fixture minutes from vaastav's `merged_gw.csv`
   (see `appearances.py`), summed into last season's actual appearance-points total.
+- **Bonus points** — last season's actual `bonus` total from vaastav (see `bonus.py`),
+  carried forward as-is; not modelled, since real bonus comes from a proprietary BPS
+  ranking we don't have the inputs to reproduce.
 
 Because player xG *and* price/position/club come from the same FPL element, there is **no
 name matching** — the old FBref↔FPL fuzzy join and manual cleaning are gone.
@@ -47,6 +50,17 @@ so we accumulate our own multi-season history rather than depending on a third-p
   estimate (`P(clean sheet) = exp(-xGA_per_game)`) from FPL's season-total
   `expected_goals_conceded` when `config.DEFENSE_USE_UNDERSTAT` is off (no goals-conceded
   penalty in that fallback path — it was never tracked before the per-match source).
+  **The two thresholds (0.8 / 2.2) are retuned, not the naive 1.0 / 2.0** — a naive
+  cutoff overstates both league-wide (a match sitting anywhere below the clean-sheet
+  cutoff gets full weight regardless of how close it is: at `xGA=0.9`, true clean-sheet
+  probability under Poisson is only ~41%). Retuned by grid search against every team's
+  real 2025-26 outcomes (actual clean sheets; actual games with 3+ conceded), minimizing
+  squared error across all 20 teams — see the comment above the constants in `config.py`
+  for the numbers. Sanity-checked against real `total_points`: before retuning, Arsenal's
+  historically dominant defense (33 real xGA, most bad-game-free season in the league)
+  got so much clean-sheet credit that the goalkeeper (Raya, real 162 points last season)
+  out-ranked every outfield player and won the optimiser's captaincy — a real calibration
+  bug, not a coding one. After retuning, the captain is Haaland, as expected.
 - **Appearance points are carried forward as last season's actual total, not
   reprojected** (`appearances.py`) — same treatment as `xG`/`xAG`. This assumes a
   player's role next season mirrors last season, which is deliberate: it's a
@@ -56,6 +70,11 @@ so we accumulate our own multi-season history rather than depending on a third-p
   overcount — e.g. three 20-minute sub appearances summing to the same total minutes
   as one 60-minute start earn very different real points), so double gameweeks are
   handled correctly for free.
+- **Bonus points are carried forward as last season's actual total, not modelled**
+  (`bonus.py`) — same "carry forward as-is" treatment as appearance points, for the
+  same reason: we don't have the BPS inputs (tackles won, chances created, etc.) to
+  reproduce FPL's proprietary top-3-per-match ranking. Bonus skews toward goal
+  involvements, so this term lifts forwards/attacking mids more than defenders.
 - **Penalty bonus is OFF by default** (`config.APPLY_PENALTY_BONUS`). FPL `expected_goals`
   already includes penalties, so v1's additive bonus would double-count.
 - **Promoted teams excluded** — clubs with < `PROMOTED_MIN_MINUTES` prior-season minutes.
@@ -78,8 +97,9 @@ overrides.py         explicit, version-controlled manual overrides
 defense.py           team expected clean sheets + bad defensive games (xClean, xBadGames)
 defcon.py            expected defensive-contribution points (+ transfer adjustment)
 appearances.py       expected appearance points (last season's actual, carried forward as-is)
+bonus.py             expected bonus points (last season's actual, carried forward as-is)
 goalkeepers.py       GK xPoints model (also folded into the squad pool)
-xpoints.py           xPoints = xG*g + xAG*a + xClean*c*(s90/38) - xBadGames*p*(s90/38) + defcon + appearance
+xpoints.py           xPoints = xG*g + xAG*a + xClean*c*(s90/38) - xBadGames*p*(s90/38) + defcon + appearance + bonus
 optimize.py          PuLP squad optimiser: full XI (GK+10), budget, club<=3, captain
 pipeline.py          end-to-end orchestration
 notebooks/driver.ipynb   thin driver: run + inspect
@@ -88,12 +108,12 @@ tests/               pytest unit tests
 
 ### Goalkeepers (`goalkeepers.py`)
 
-GK xPoints = saves/3 + clean-sheet term − bad-defensive-game term + appearance points.
-Captures the save-volume signal: a keeper facing many low-danger shots scores on saves
-*and* clean sheets. The clean-sheet, goals-conceded and appearance terms all use the
-same `xClean` / `xBadGames` / `expected_appearance_points` signals as the outfield
-model (see the xPoints formula below) — no separate GK-specific calculation, so GK and
-outfield xPoints stay on one scale.
+GK xPoints = saves/3 + clean-sheet term − bad-defensive-game term + appearance points
++ bonus points. Captures the save-volume signal: a keeper facing many low-danger shots
+scores on saves *and* clean sheets. The clean-sheet, goals-conceded, appearance and
+bonus terms all use the same `xClean` / `xBadGames` / `expected_appearance_points` /
+`expected_bonus_points` signals as the outfield model (see the xPoints formula below)
+— no separate GK-specific calculation, so GK and outfield xPoints stay on one scale.
 
 The GK is **folded into the squad optimiser** — `pipeline.run()` picks a full XI
 (1 GK + 10 outfield) under one budget (`config.SQUAD_BUDGET`, the XI budget; the rest
@@ -116,6 +136,7 @@ xPoints = xG * POINTS_FOR_GOAL[position]
         - xBadGames * POINTS_FOR_CONCEDED[position] * (s90 / GAMES_PER_SEASON)
         + expected_defcon_points
         + expected_appearance_points
+        + expected_bonus_points
 ```
 
 - `xG`, `xAG` — season expected goals / assists (from `blend.py`, defaults to last
@@ -132,11 +153,11 @@ xPoints = xG * POINTS_FOR_GOAL[position]
   Both `xClean` and `xBadGames` are scaled down by `s90 / GAMES_PER_SEASON` so a
   part-season player isn't credited with (or docked for) a full season of them.
 - `s90` — expected 90s played this season.
-- `expected_defcon_points`, `expected_appearance_points` — already expressed in
-  points, not a rate (from `defcon.py` / `appearances.py` respectively); added as-is,
-  not scaled by `s90 / GAMES_PER_SEASON` again. `expected_appearance_points` in
-  particular is just last season's real appearance-points total carried forward
-  unchanged (see the caveat above) — it isn't derived from `s90` at all.
+- `expected_defcon_points`, `expected_appearance_points`, `expected_bonus_points` —
+  already expressed in points, not a rate (from `defcon.py` / `appearances.py` /
+  `bonus.py` respectively); added as-is, not scaled by `s90 / GAMES_PER_SEASON` again.
+  The latter two in particular are just last season's real totals carried forward
+  unchanged (see the caveats above) — neither is derived from `s90` at all.
 - `POINTS_FOR_GOAL`, `POINTS_FOR_CLEAN`, `POINTS_FOR_CONCEDED`, `POINTS_FOR_ASSIST`,
   `GAMES_PER_SEASON` — from `config.py`; the first three are per-position dicts
   (`{"GK": 6, "DEF": 6, "MID": 5, "FWD": 4}`, `{"GK": 4, "DEF": 4, "MID": 1, "FWD": 0}`,
@@ -147,16 +168,17 @@ Worked example — Gabriel, the current #1 defender (`position=DEF`, so goal wei
 clean weight 4, conceded weight 1):
 
 ```
-xPoints = 2.94*6 + 1.75*3 + 26.0*4*(30.56/38) - 3.0*1*(30.56/38) + 25.74 + 62.0
-        = 17.64  + 5.25   + 83.63                - 2.41            + 25.74 + 62.0
-        = 191.84
+xPoints = 2.94*6 + 1.75*3 + 22.0*4*(30.56/38) - 3.0*1*(30.56/38) + 25.74 + 62.0 + 30.0
+        = 17.64  + 5.25   + 70.76                - 2.41            + 25.74 + 62.0 + 30.0
+        = 208.98
 ```
 
-`xpoints.breakdown()` computes these same six terms as their own columns
+`xpoints.breakdown()` computes these same seven terms as their own columns
 (`goal_points`, `assist_points`, `clean_points`, `conceded_points`, `defcon_points`,
-`appearance_points`, summing to `xPoints`) — used by the defender xPoints-breakdown
-chart in `notebooks/defender_points_breakdown.ipynb`, but not currently persisted to
-`forecast.csv` (only `pipeline.run(save=True)`'s output columns are).
+`appearance_points`, `bonus_points`, summing to `xPoints`) — used by the defender
+xPoints-breakdown chart in `notebooks/defender_points_breakdown.ipynb`, but not
+currently persisted to `forecast.csv` (only `pipeline.run(save=True)`'s output
+columns are).
 
 ### Defensive contribution (`defcon.py`)
 
