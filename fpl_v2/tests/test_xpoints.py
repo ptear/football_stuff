@@ -1,0 +1,32 @@
+import pandas as pd
+
+from fpl_v2 import xpoints
+
+
+def test_xpoints_formula():
+    """xPoints matches the hand-computed value for each position."""
+    df = pd.DataFrame([
+        {"code": 1, "position": "FWD", "xG": 10, "xAG": 5, "s90": 38, "team_name": "A"},
+        {"code": 2, "position": "DEF", "xG": 2, "xAG": 1, "s90": 19, "team_name": "A"},
+        {"code": 3, "position": "MID", "xG": 8, "xAG": 4, "s90": 38, "team_name": "B"},
+    ])
+    xclean = pd.DataFrame({"team_name": ["A", "B"], "xClean": [10.0, 6.0]})
+
+    out = xpoints.compute(df, xclean).set_index("code")["xPoints"]
+
+    # FWD: 10*4 + 5*3 + 10*0*(38/38) = 55
+    assert out[1] == 55
+    # DEF: 2*6 + 1*3 + 10*4*(19/38) = 12 + 3 + 20 = 35
+    assert out[2] == 35
+    # MID: 8*5 + 4*3 + 6*1*(38/38) = 40 + 12 + 6 = 58
+    assert out[3] == 58
+
+
+def test_missing_team_xclean_is_zero():
+    """A team with no xClean row contributes 0 to the clean-sheet term, no NaN."""
+    df = pd.DataFrame([
+        {"code": 1, "position": "DEF", "xG": 0, "xAG": 0, "s90": 38, "team_name": "Z"},
+    ])
+    out = xpoints.compute(df, pd.DataFrame({"team_name": [], "xClean": []}))
+    assert out.loc[0, "xClean"] == 0
+    assert out.loc[0, "xPoints"] == 0
